@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VueXjs23-1 Action</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{increment}}</p>
+        <button @click="incrementBy">+</button>
+        <button @click="Delay">5s delay +</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.js"></script>
+    <script>
+    //Action 做完，最後會呼叫 Mutation，再讓 Mutation 去改 state
+    //Action 也可以更動 component 
+    //Action 是非同步，可以去接 API
+    //store.commit 是在抓 Mutation 裡的方法
+    //store.dispatch 是在抓 Action 裡的方法
+
+        const store = new Vuex.Store({
+            state:{
+                count:0
+            },
+            mutations: {
+                increment(state){
+                    state.count++
+                },
+                setPayload(state,payload){
+                    state.count += payload.amount
+                },
+            },
+            actions:{
+                increment(context){//context裡有很多功能
+                    console.log(context)
+                    context.commit("increment")
+                },
+                setDelay({commit,state}){//從 context 裡拆出來的功能
+                    //非同步處理
+                    //Promise 保證有一個結果，然後用 return 回傳結果
+                    //reject 駁回 事情沒完成或是失敗，告訴 Promise 結果
+                    //resolve 事情完成同過或是成功、ok，告訴 Promise 結果
+                    return new Promise((reject,resolve)=>{
+                        setTimeout(()=>{
+                            try{
+                                commit("setPayload",{amount:state.count++})
+                                resolve(state.count)
+                            }
+                            catch{
+                                console.log("err")
+                            }
+                        },5000)      
+                    })
+                }
+            }
+        })
+
+        const vm = new Vue({
+            el:"#app",
+            data:{
+                count:0,
+            },
+            store,
+            computed:{
+                ...Vuex.mapState({
+                    increment:"count"
+                })
+            },
+            methods:{
+                ...Vuex.mapMutations({
+                    incrementBy:"increment",
+                }),
+                ...Vuex.mapActions({
+                    Delay:"setDelay"
+                })
+            },
+        })
+    </script>
+</body>
+</html>

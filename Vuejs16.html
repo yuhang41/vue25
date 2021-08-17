@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs16</title>
+    <style>
+        .router-link-exact-active{
+            background: black;
+            color: white;
+        }
+    </style>
+</head>
+<!-- 畫面顯示帶網址 -->
+<body>
+    <div id="app">
+        <p>
+            <!-- <a href="/page1">A  Page1</a> -->
+            <router-link to="/">Index</router-link>
+            <router-link to="/page1">Page1</router-link><!-- VueRouter 提供更換頁面按鍵，用 to= 去找網址 -->
+            <router-link to="/page2">Page2</router-link><!-- router-link 點下去後會自動產生一個 class= 的 active -->
+        </p>
+        <p><router-link to="/optional-params">/optional-params</router-link></p>
+        <p><router-link to="/params-with-regex/123">/params-with-regex/123</router-link></p>
+        <p><router-link to="/params-with-regex/abc">/params-with-regex/abc</router-link></p>
+        <p><router-link to="/optional-group/bar">/optional-group/bar</router-link></p>
+        <p><router-link to="/optional-group/foo/bar">/optional-group/foo/bar</router-link></p>
+        <router-view></router-view><!-- 顯示router的畫面 -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+    //router 看成實體，網址對到畫面，用來操作或控制
+    //route 用來紀錄或讀取
+    //可用頁面的 $vm0.router 跟 $vm0.route 來看有哪些功能可以使用
+        let Index ={
+            template:`<div>Index</div>`
+        }
+        let Page1 = {
+            template:`<div>Page 1</div>`
+        }
+        let Page2 = {
+            template:`<div>Page 2</div>`
+        }
+        
+        let question = {
+            template:`
+                <ul>
+                    <li>question /optional-params</li>
+                    <li>question /optional-params/foo</li>             
+                </ul>
+            `
+        }
+        let Regex ={
+            template:`
+                <ul>
+                    <li>question /params-with-regex/123</li>
+                    <li>question /params-with-regex/abc</li>
+                </ul>
+            `
+        }
+        let Group ={
+            template:`
+                <ul>
+                    <li>question /optional-group/bar</li>
+                    <li>question /optional-group/foo/bar</li>
+                </ul>
+            `
+        }
+        
+        let router =new VueRouter({
+            //routes分配規則
+            routes:[
+                {
+                    path:"/",
+                    component: Index
+                },
+                {                  
+                    path:'/page1',//網址，在網址上加上                 
+                    component: Page1,//畫面，顯示模組
+                },
+                {
+                    path:"/page2",
+                    component: Page2
+                },
+                {
+                    path: '/optional-params/:foo?',//問號代表網址上 可打參數，也可不打參數
+                    component: question
+                },
+                {
+                    path: '/params-with-regex/:id(\\d+)',// (\\d+) 正則判斷 只要不是數字，就沒有任何動作， d 就是數字
+                    component: Regex
+                },
+                {
+                    path: '/optional-group/(foo/)?bar',// (foo/)? 可以非必填
+                    component: Group
+                },
+            ],
+        })
+
+        new Vue({
+            el:"#app",
+            router,
+            data:{
+                show:1
+            }
+        })
+    </script>
+</body>
+</html>

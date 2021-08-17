@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs21</title>
+</head>
+<!-- 簡單講解的VueX -->
+<body>
+    <div id="app1">
+        <div>app1: {{shareState.count}}</div>
+        <button @click="clickHandler">-</button>
+    </div>
+    <div id="app2">
+        <div>app2: {{shareState.count}}</div>
+        <button @click="clickHandler">+</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        //將data的狀態拉出來外面，就可以給兩個Vue使用同一個data
+        let store={
+            state:{
+                count:0
+            },
+            increment(){
+                this.state.count++
+            },
+            decrement(){
+                this.state.count--
+            }
+        }
+        new Vue({
+            el:"#app1",
+            data:{
+                shareState:store.state
+            },
+            methods:{
+                clickHandler(){
+                    store.decrement()
+                }
+            }
+        })
+        new Vue({
+            el:"#app2",
+            data:{
+                shareState:store.state
+            },
+            methods:{
+                clickHandler(){
+                    store.increment()
+                }
+            }
+        })
+    </script>
+</body>
+</html>

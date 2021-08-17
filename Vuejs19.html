@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs19</title>
+</head>
+<!-- 
+    用routes 的 props 來傳參數
+    -----------------------------
+    當要切換routes component 順序
+    1.beforeRouteLeave 離開 routes component 
+    2.beforeEach 準備要進入 routes，
+    3.beforeRouteUpdate 進入之後有變數更換，但 routes component 不變
+    3.beforeRouteEnter 第一次進入 routes component    
+    4.beforeEnter 準備要進入 routes
+    beforeEach 與 beforeEnter 差別 :
+    beforeEach 針對每個 routes 設定一樣的事情
+    beforeEnter 針對每個 routes 設定不一樣的事情
+-->
+<body>
+    <div id="app">
+        <!-- tag 也可以用三元運算來判斷 -->
+        <router-link to="/123?test=aaa" tag="button">Index</router-link>
+        <router-link to="/user/456?test=bbb">User</router-link>
+        <router-link to="/second/222?test=second">Second</router-link>
+        <router-link to="/third/777?test=third">Third</router-link>        
+        <transition name="xxx">
+            <router-view></router-view>
+        </transition>
+        
+        <third uid="333" test="ccc"></third>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        let Index ={
+            template:`
+                <div>
+                    <p>{{$route.params.id}}</p>
+                    <p>{{$route.query.test}}</p>                                           
+                </div>
+            `,
+            props:["id","test"],
+            beforeRouteEnter(to,from,next){
+                next()
+            },
+            beforeRouteUpdate(to,from,next){
+                next()
+            },
+            beforeRouteLeave(to,from,next){
+                next()
+            },
+        }
+        let User ={
+            template:`
+                <div >
+                    <p>{{$route.params.id}}</p>
+                    <p>{{$route.query.test}}</p>
+                </div>
+            `,
+            props:["id","test"]    
+        }
+        let Second ={
+            template:`
+                <div >
+                    <p>{{$route.params.id}}</p>
+                    <p>{{$route.query.test}}</p>
+                </div>
+            `,
+            props:["id","test"]    
+        }
+        let Third ={
+            template:`
+                <div >
+                    <p>{{uid}}</p>
+                    <p>{{test}}</p>
+                </div>
+            `,
+            props:["uid","test"]
+        }
+
+        let router = new VueRouter({
+            scrollBehavior (to, from, savedPosition) {
+                //如果頁面卷軸在中間或是下方，然後在切換頁面後，新頁面會彈至頂端
+                return { x: 0, y: 0 }
+            },
+            routes:[
+                {
+                    path:"/:id",
+                    component:Index,
+                    props:true//代表可以傳資料進來
+                },
+                //routes 裡帶 props 時，如果你的 component 是單一型態的取名稱，就可以直接 props:true，
+                //如果 components 是多個型態時，props 就也要跟著取多個型態的方式，props:{default:true}
+                //兩個 component components 差別，有沒有加 s 差別
+                {
+                    path:"/user/:id",
+                    components:{
+                        default: User,
+                    },
+                //第一種作法
+                    props:{default:true}   
+                },
+                {
+                    path:"/second/:id",
+                    components:{
+                        default: Second,
+                    },
+                //第二種做法
+                    props:{
+                        default:{
+                            id:"123",
+                            test:"bbb" //可以成功存到 props 的 $route.query.test 裡
+                        },
+                    }
+                },     
+                {
+                    path:"/third/:uid",
+                    components:{
+                        default: Third,
+                    },
+                    meta:{requiresAuth: true},//meta 像是一個驗證碼 meta:{key:value}
+                //第三種作法
+                    props:{
+                        default:route=>({
+                                uid:route.params.uid,
+                                test:route.query.test
+                            })
+                    },
+                    beforeEnter(to,from,next){
+                        next()
+                    }
+                }
+            ],            
+        })
+        router.beforeEach((to,from,next)=>{
+            //to 準備要去的 component 裡的物件
+            //from 從哪裡來，如果 matched 裡是空的，就表示是從其他網頁切進來，而不是從內部網頁切換過來的
+            //next() 可以往下走，像是可以下一頁的意思
+            //next(false) 不能在下一頁，只能停在此頁
+            //next({ path: '/' }) 直接導入 path 的網頁，也可以把 path 改成 name:'' 或是 reaplace:true，作法就像是 router-link's to prop 和 router.push
+            //next() 所有的 next 只會執行一次，但可以寫很多個
+            if(to.matched.some(record => record.meta.requiresAuth)){
+                console.log("pass")
+            }
+            console.log(to,from,next)
+            next()
+        })
+        router.afterEach((to,from)=>{
+            console.log(to,from)
+        })
+
+        new Vue({
+            el:"#app",
+            router,
+            components:{
+                Third
+            },
+            data:{
+            }
+        })
+        const Foo = () => import(/* webpackChunkName: "group-foo" */ './Foo.vue')
+    </script>
+</body>
+</html>

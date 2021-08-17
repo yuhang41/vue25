@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs06</title>
+</head>
+<body>
+    <div id="app">
+        <!-- <h1>{{ count }}</h1>
+        <button v-on:click="count -= 1">-1</button>
+        <button v-on:click="count += 1">+1</button> -->
+
+        <!-- <button v-for="num of total" @click="count = num-1">{{num-1}}</button>
+        <h1>{{ count }}</h1> -->
+
+        <!-- <button v-for="(con,index) of content" @click="count = index">{{index}}</button>
+        <div>
+            <h1 v-for="(con,index) of content" v-show="count == index">{{ con }}</h1>
+        </div> -->
+
+        <button @click="nowPage -= 1" v-show="nowPage > 1">Prev</button>
+        <div v-for="pagL of pageList">{{ pagL }}</div>
+        <button @click="nowPage += 1" v-show="totalPage > nowPage">Next</button>
+        <br/>
+
+        <!-- 事件偵聽(有event可以使用) ，event 是預設 
+        <button v-for="(con,index) of content" @click="clickHandler" :data-index="index">{{index}}</button>
+        <div>
+            <h1 v-for="(con,index) of content" v-show="count === index">{{ con }}</h1>
+        </div> -->
+
+        <!-- 事件執行(沒有event可用)
+             如果要在這個 function 裡執行 event 可以這樣打clickHandler2(index,$event) 加個 $ 字符號，意思是從 Vue 內建裡找 event
+            -->
+        <button v-for="(con,index) of content" @click="clickHandler2(index)" :data-index="index">{{index}}</button>
+        <div>
+            <h1 v-for="(con,index) of content" v-show="count === index">{{ con }}</h1>
+        </div>
+
+        <!-- .self 事件指定自己，按到內部的 a 或 button 是不會觸發事件，除非按到的是最外層的事件本身 
+             .stop 會阻擋其他一樣的事件
+             .prevent 去處理一些預設事件 例如 a href="#" 或是 submit
+             .capture 氣泡模式
+             .once 事件只觸發一次
+             .passive 提升效能， .prevent 不要跟 .passive一起使用
+             這些都有前後的區分，例如:.prevent.self 會先把所有會被 .prevent 處理的先處理，再來執行 .self
+                                    .self.prevent 會先用 .self 指定只有這個事件要處理 .prevent-->
+        <div @click.self="selfClick" style="border: 1px solid;">
+            <a href="#">
+                <button>AAA</button>
+            </a>
+        </div>
+        <div @scroll.passive="scrollHandler('1')" style="height:200px; border:1px solid; overflow-y: scroll;">
+            <div style="height:500px;"></div>
+        </div>
+
+        <!-- keyCode
+             .exact 精準的判斷指定的這個按鍵，@click.ctrl 這個 ctrl + 任一個鍵 這個事件還是會觸發，@click.ctrl.exact 這個 ctrl + 任一鍵就不會觸發
+        -->
+        <input @keyup.17="scrollHandler('1')" type="text">
+
+        <!-- Mouse Button 
+             .left
+             .right
+             .middle -->
+             <input @click.right.prevent="scrollHandler('mouse right')" type="text">
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let vm =new Vue({
+            el:"#app",
+            data:{
+                count: 0,
+                total: 4,
+                content:["aaa","bbb","ccc","ddd"],
+                list:["aaa","bbb","ccc","ddd","eee","fff","ggg","hhh",111,222,333],
+                prePage: 4,
+                nowPage: 1,
+            },
+            computed:{
+                pageList(){
+                    let start = (this.nowPage - 1) * 4
+                    return this.list.slice(start,start + this.prePage)
+                },
+                totalPage(){
+                    return Math.ceil(this.list.length / 4)
+                    
+                }  
+            },
+            methods:{
+                clickHandler(event){
+                    console.log("click",event)
+                    this.count = (event.target.dataset.index)*1
+                },
+                clickHandler2(index){
+                    this.count = index
+                },
+                selfClick(event){
+                    console.log(event.target)
+                },
+                scrollHandler(n){
+                    console.log(n)
+                }
+            },
+        });
+    </script>
+</body>
+</html>

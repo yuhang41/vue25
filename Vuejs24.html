@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VuejsX24</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{count}}</p>
+        <p>{{$store.state}}</p>
+        <button @click="incrementBy">+</button>
+        <!-- 做了 namespaced 的 moduleA 已經不會跟 其他 module 做方法了，
+             所以 commit('a/increment') 這裡的 a 表示 Vuex.store 裡幫 moduleA 放進的參數名稱 a-->
+        <button @click="$store.commit('a/increment')">a +</button>
+
+        <button @click="toggleBHandler">Toggle to B and c</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.js"></script>
+    <script>
+    //Module 作法 
+        const moduleA = {
+            namespaced: true,//可以跟其他 module 做區別，不會同進退
+            state:{
+                count:0
+            },
+            getters:{
+                plusCount(state,getters,rootState,rootGetters){//rootState,rootGetters 意思是可以去 Vuex.Store(因為是根) 使用這裡的 state 和 getters
+                    return state + 1
+                }
+            },
+            mutations:{
+                increment(state){//這裡的 state 是 moduleA 的，不會選擇外面的 state 使用
+                    state.count +=2
+                }
+            },
+            actions:{
+                plusCount({state,getters,rootState,rootGetter,commit}){
+                    //commit("increment") 這會去拿 moduleA 的 increment
+                    commit("increment",null,{root:true})//因為加了 {root:true} ，所以是去拿 Vuex.Store 的 increment
+                    
+
+                }
+            },
+        }
+        const moduleB = {
+            state:{
+                count:0
+            },
+            mutations:{
+                increment(state){//這裡的 state 是 moduleB 的
+                    state.count +=3
+                }
+            }
+        }
+        const moduleC = {
+            state:()=>({
+            //這裡的 state 跟其他 module 不一樣，這裡的 state 用了 函式function
+            //只要使用動態的註冊 module 方式，每次被註冊就再重新執行一次 state ，
+            //所以就會 return count:0 ，意思就是說 動態註冊 就會讓 count 歸 0
+                count:0
+            }),
+            mutations:{
+                increment(state){
+                    state.count +=5
+                }
+            }
+        }
+
+        const store = new Vuex.Store({
+            state:{
+                count:0
+            },
+            modules: {//這裡的 modules 是靜態的，無法主動去移除
+                a: moduleA,
+                //b: moduleB 如果這裡不註冊 moduleB 可以到 Vue 裡去註冊
+            },
+            mutations:{
+                increment(state){
+                    state.count ++
+                }
+            }
+        })
+        const vm = new Vue({
+            el:"#app",
+            store,
+            computed:{
+                ...Vuex.mapState({
+                    count:"count"
+                })
+            },
+            methods:{
+                ...Vuex.mapMutations({
+                    incrementBy:"increment"
+                }),
+                toggleBHandler(){
+                //這裡是用動態的 module 可以用手動的方式去移除跟增加
+                    if(this.$store.hasModule("b")){//判斷是不是已經註冊過了
+                        this.$store.unregisterModule("b",moduleB)
+                        this.$store.unregisterModule("c",moduleB)
+                        //刪除 registerModule
+                    }
+                    else{
+                        this.$store.registerModule("b",moduleB)
+                        //註冊 modulB，註冊成功的話， Vuex 就可以使用，
+                        //像是在 Vuex 裡這樣註冊 ->  b: moduleB
+
+                        this.$store.registerModule("c",moduleB)
+                    }
+
+                    //this.$store.registerModule(["a","b"],moduleB)
+                    //巢狀註冊， "b" 會被寫進 "a" 裡
+                }
+            }
+        })
+    </script>
+</body>
+</html>

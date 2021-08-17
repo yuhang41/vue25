@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs08</title>
+</head>
+<body>
+    <div id="app">
+        <p><input type="text" v-model="inputText" @keyup.enter="inputHandler"></p>
+        <p>
+            <button @click="show = 'all'">全部</button>
+            <button @click="show = 'don'">未完成</button>
+            <button @click="show = 'end'">完成</button>
+        </p>      
+        <ul>
+            <li v-for="(item,index) of filterList" :key="item.timestamp">
+                <template v-if="editing === item">
+                    <input type="text" v-model="newInpText">
+                    <button @click="updateFinish">Finish</button>
+                    <button @click="updateCancel">Cancel</button>
+                </template>
+                <template v-else="editing !== item">
+                    <input type="checkbox" v-model="item.statu">
+                    {{item.content}}
+                    <button @click="updateHandler(item)">Update</button>
+                    <button @click="deleteHandler(item)">Delete</button>
+                </template>      
+            </li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>   
+    <script>
+        new Vue({
+            el:"#app",
+            data:{
+                inputText:"",
+                list:[],
+                editing:null,
+                newInpText:"",
+                show:"all"
+            },
+            computed:{
+                filterList(){
+                    if(this.show === "all"){
+                        return this.list
+                    }
+                    else if(this.show === "don"){
+                        return this.list.filter((item) =>{
+                            return item.statu === false
+                        })
+                    }
+                    else if(this.show === "end"){
+                        return this.list.filter((item) =>{
+                            return item.statu === true
+                        })
+                    }
+                    else{
+                        return []
+                    }
+                }
+                
+            },
+            methods:{
+                inputHandler(){
+                    this.list.push({
+                        timestamp:new Date().getTime(),
+                        statu:false,
+                        content:this.inputText
+                    })
+                    this.inputText=""
+                },
+                deleteHandler(item){
+                    this.list = this.list.filter((lis)=>{
+                                    return lis != item 
+                                })
+                    
+                },
+                updateHandler(index){
+                    this.editing = index
+                },
+                updateFinish(){                    
+                    //this.list[this.editing].content = this.newInpText
+                    this.editing.content = this.newInpText
+                    this.newInpText="",
+                    this.editing=null
+                },
+                updateCancel(){
+                    this.newInpText="",
+                    this.editing=null
+                }
+            }
+        })
+    </script>
+</body>
+</html>

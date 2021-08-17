@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs15</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{ firstUpper(first) }}</p><!-- methods做法 -->
+        <p>{{ firstUpper(last) }}</p>
+        <p>{{ first + last | firstUpper }}</p><!-- filter做法 -->
+        <!-- filter也可以做很多次 ex: {{ first | filterA | filterB }} 先做完 filterA 再把得到的結果給 filterB 做-->
+        <p>{{ first + last | firstUpper("aaa",123) }}</p><!-- filter也可以傳參數 -->
+        <button @click="log('click')">Myplugin</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        //Vue-router
+        let Myplugin={
+            install: function(Vue, options){
+                //console.log(Vue, options)
+                Vue.mixin({
+                    methods:{
+                        log(arg){
+                            console.log(arg)
+                        }
+                    }
+                })
+            }
+        }
+        //再用 use 去呼叫
+        Vue.use(Myplugin,{test:true})
+
+        //filter 像是專門用來做文字格式的methods
+        Vue.filter("firstUpper",function(value,...arg){
+            console.log(value , ...arg)
+            return value.charAt(0).toUpperCase()+value.slice(1)
+        })
+        new Vue({
+            el:"#app",
+            data:{
+                first:"YuHang",
+                last:"Xiao"
+            },
+            methods:{
+                firstUpper(value){
+                    return value.charAt(0).toUpperCase()+value.slice(1)
+                }
+            }
+        })
+    </script>
+</body>
+</html>

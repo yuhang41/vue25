@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>directive</title>
+</head>
+    <style>
+        .col-12{
+            height: 100px;
+            width: calc(50% - 40px);
+            box-sizing: border-box;
+            border: 1px solid rgb(0, 0 , 0);
+        }
+    </style>
+<body>
+    <div id="app">
+        {{count}}
+        <button @click="clickHandler">Add</button>
+        <br/>
+        width:{{ww}}
+        <my-input v-for="num of count" :key="num" :count="count"></my-input>
+
+        <div id="hook-arguments-example" v-demo:foo.a.b="message"></div>
+        <!-- <div id="hook-arguments-example" v-demo:[可傳資料].a.b="message"></div> -->
+
+        <div class="col-12" v-width></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        //自創 directive ，所謂的 directive 就是 v-for、v-bind、v-......
+        Vue.directive('focus', 
+            //directive 有5個 Hook : inserted、bind、update、componentUpdate、unbind
+            //inserted 當模組載入畫面時會執行
+            //bind 的 function 只會觸發一次
+            //update 不管數值有沒有改變一樣會觸發
+            //componentUpdate 全都更新完了就會觸發
+            //unbind 結束了會觸發一次
+            function (el,binding) {
+                //focus 是指定 element，這個 element 會成為畫面的焦點，得到焦點的 element 會作為鍵盤導航的當前 target
+                el.focus()
+                console.log(binding)
+            }
+        )
+        //function (el,binding) 的 binding 裡會顯示的參數
+        Vue.directive('demo', {
+            bind: function (el, binding, vnode) {
+                var s = JSON.stringify
+                el.innerHTML =
+                'name: '       + s(binding.name) + '<br>' +
+                'value: '      + s(binding.value) + '<br>' +
+                'expression: ' + s(binding.expression) + '<br>' +
+                'argument: '   + s(binding.arg) + '<br>' +
+                'modifiers: '  + s(binding.modifiers) + '<br>' +
+                'vnode keys: ' + Object.keys(vnode).join(', ')
+            }
+        })
+        Vue.directive('width',function(el,binding){
+            el.innerHTML = el.getBoundingClientRect().width
+        })
+
+        let MyInput={
+            props:["count"],
+            template:`<p><input v-focus="count"/></p>`
+            //binding 裡 arg 讀到字串
+            //template:`<p><input v-focus:test.hang="count"/></p>`
+            //binding 裡 modifiers 讀到 物件
+            //template:`<p><input v-focus.hang:test="count"/></p>`
+        }
+        new Vue({
+            el:"#app",
+            data:{
+                count:0,
+                message:"hello",
+                ww:0
+            },
+            components:{MyInput},
+            mounted(){//可以事件偵聽
+                window.addEventListener("resize",this.resizeHandler)
+                this.resizeHandler()
+            },
+            beforDestory(){//事件偵聽完需要刪除的地方
+                window.removeEventListener("resize",this.resizeHandler)
+            },
+            methods:{
+                resizeHandler(){
+                    this.ww=window.innerWidth
+                },
+                clickHandler(){
+                    this.count++
+                }
+            }
+        })
+    </script>
+</body>
+</html>

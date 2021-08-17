@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!-- observer 觀測者 $set 
+    Watcher{ deep:ture 要不要再往裡面找資料 }
+-->
+<style>
+    body{
+        background: green;
+    }
+    .objList,.numberList{
+        display: flex;
+    }
+    .objList > div,
+    .numberList >div{
+        margin: 0px 10px;
+        background: honeydew;
+        color: gray;
+        font-size: 2em;
+        border: 1px solid black;
+        border-radius: 50%;
+        padding: 20px;
+    }
+</style>
+<body>
+    <div id="app">
+        <div class="objList">
+            <div @click="objListHandler(index)" v-for="(item,index) of objList">{{ item.num }}</div>
+        </div>
+        <div class="numberList">
+            <div @click="numberListHandler(index)" v-for="(number,index) of numberList">{{ number }}</div>
+        </div>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                objList:[{num:0},{num:0},{num:0}],
+                numberList:[0,0,0]
+            },
+            methods:{
+                objListHandler(index){
+                    this.objList[index].num++
+                },
+                numberListHandler(index){
+                    //this.numberList[index]++ 這個無法通知資料要更改，沒有 observer(觀測者)，只要有 observer 就可以去跟資料溝通說要更改
+                    state.$set(this.numberList,index,this.numberList[index]+1)
+                    //this.$set() 通知資料要設東西，就會有 observer 效果
+                    //this.$set(要設定的東西，設定位子，設定成甚麼)
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs04</title>
+    <Style>
+        #app.isActive{
+            background: red;
+        }
+    </Style>
+</head>
+<body>
+    <div id="app" :class="active">
+        <!-- <div :class="[active?'ddd':'fff',classArray]">classArray</div> -->
+        <div :class="classArray">classArray</div>
+        <a v-bind:href="link.href" v-bind:target="link.target">{{link.content}}</a>
+        <input :type="input.type">
+        <div :class="classContent">classContnen</div>   
+        <div :style="stlyeObj">styleObj</div>   
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                //return {
+                    link:{
+                        href:"https://www.google.com.tw/webhp?tab=rw",
+                        target:"_blank",
+                        content:"Google"
+                    },
+                    input:{
+                        type:"text"
+                    },
+                    classContent:{
+                        aaa:true,
+                        bbb:true,
+                        ccc:true,
+                        dd_ee: true,
+                        'ff-gg':true
+                    },
+                    active:{
+                        isActive:true
+                    },
+                    classArray:[this.active?"ddd":"fff","aaa","bbb","ccc"],
+                    stlyeObj:{
+                        color:"red",
+                        fontSize:"30px",
+                        background:"black"
+                    }
+               // }
+            }
+        });
+        //v-bind的class 跟html的class 兩者會合併
+        //v-bind的href 跟html的href 兩者會看誰在前，會覆蓋
+        //v-bind的style 跟html的style，以v-bind的style為主，蓋掉html的style，但如果有兩者內容參數不一樣，則會合併
+    </script>
+</body>
+</html>

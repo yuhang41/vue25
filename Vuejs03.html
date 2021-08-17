@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs03</title>
+</head>
+<body>
+    <div id="app">
+        computed: {{reversedMessage}}
+        <br/>
+        methods: {{reversedMessage1()}}
+        <br/>
+        get: {{newMsg}}
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                msg:"Hello World"
+            },
+            computed:{
+                newMsg:{
+                    get:function(){
+                        console.log("newMsg");
+                        return "new "+ this.msg
+                    },
+                    set:function(val){
+                        this.msg=val+" ( new )"
+                    }
+                },
+                // a computed getter
+                reversedMessage: function(){
+                    console.log("computed");
+                    // `this` points to the vm instance
+                    return this.msg.split('').reverse().join("")
+                }
+            },
+            methods:{
+                reversedMessage1: function(){
+                    console.log("methods");
+                    return this.msg.split('').reverse().join("")
+                }
+            }
+        });
+        //data 資料
+        //computed 資料產資料，資料處理
+        //methods 可以處理資料，大部分作行為跟功能
+        //watch 資料產事件或是資料產行為，依照資料的改變處理
+        //watch 在更改網址進到頁面時，預設不會有動作
+        //watch 只要資料變動就可以觸發
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs11</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 只要是在 component 上打的 v-on 事件，都會認定是從 component 的 $emit 丟出來的客製化事件，
+             @click 是 HTML 裡的原始事件，但因為在 component 上，所以這裡認定 @click 是從 $emit 客製化出來的，
+             只要加上 .native 就會認定不是 $emit 客製化出來，這裡只要 @click.native 這樣做，就可以用 HTML 的 @click 原始事件觸發 -->
+        <!-- <basic-component v-model="test" @click.native="eventHandler"/> -->
+
+        <!-- <basic-component v-model="test" :title="title" @event-component="eventHamdler"
+                         @title-component="titleHamdler"/> 沒有使用 .sync-->
+
+        <!-- <basic-component v-model="test" :title.sync="title" @event-component="eventHandler"/> 使用.sync 綁定單個 props 屬性-->
+        <basic-component v-model="test" v-bind.sync="content" @event-component="eventHandler"/><!-- 使用.sync 綁定多個 props 屬性 -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        //camel case 駝峰式命名 例如:camelCase
+        //pascal case 字首大寫的命名 例如:PascalCase
+        //kebab case 兩者空格之間加上 - 例如:cabab-case
+        //snake case 兩者空格之間加上 _ 例如:snake_case
+
+        let BasicComponent ={
+            template:`
+                        <div class="basic-component" @click="emitHandler">
+                            BasicComponent {{title}}
+                        </div>
+                    `,
+            //以下是客製化 v-model
+            //model 屬性裡有兩種功能 prop 跟 event
+            //prop 指定一個 props 裡自創的屬性名稱
+            //event 綁一個自創的事件名稱
+            model:{
+                prop:"active",
+                event:"event-component"
+            },
+            props:{
+                active:{
+                    type:Boolean,
+                    default:false
+                },
+                title:{
+                    type:String,
+                    required:true
+                },
+                description:{
+                    type:String,
+                    required:true
+                }
+            },
+            methods:{
+                emitHandler(){
+                    //this.title="New Title" 不能改掉 props 的 title 值
+                    this.$emit("event-component",!this.active)
+                    //this.$emit("title-component","New Title") 原始的資料向外丟
+
+                    //使用了.sync 的 $emit("update:輸入要更改的props",值)
+                    //.sync 是在大量使用內外部更改資料時使用，比較快速
+                    // 像是跟 new Vue 的資料同步，就可以直接更改
+                    this.$emit("update:title","New Title")
+
+                }
+            }
+        }
+        new Vue({
+            el:"#app",
+            data:{
+                test:true,
+                content:{
+                    title:"Hello world",
+                    description:"Hello world"
+                }
+                
+            },
+            components:{
+                BasicComponent
+            },methods:{
+                eventHandler(){                    
+                    console.log("this is component")
+                },
+                // titleHandler(newTitle){
+                //     this.title=newTitle
+                // }
+            }
+        })
+    </script>
+</body>
+</html>

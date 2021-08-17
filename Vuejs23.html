@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VuejsX23</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{increment}}</p>
+        <button @click="incrementBy">+</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.js"></script>
+    <script>
+    //state 的資料只能靠 Mutation 來修改
+    //Mutation 改 state ， state 去產 getter
+    //Mutation 可以用 commit 來更動 component 畫面
+    //Mutation 必須是同步的
+        const setDefind = "setDefind"//讓 commit(String,2)，String 段就不用打字串    
+
+        const store = new Vuex.Store({
+            state:{
+                count:0
+            },
+            mutations: {//Mutation 裡的定義的方法想像成事件
+                increment(state){
+                    state.count++
+                },
+
+                //number 給 store.commit("setCount",5) 這裡的 5 就是 number 數值                
+                setCount(state,number){
+                    state.count += number
+                },
+                //store.commit("setCount",5) ，像addEventListener
+
+                setPayload(state,payload){
+                    state.count += payload.amount
+                },
+                //store.commit("setPayload",{count:15})
+                //store.commit({type:"setPayload",count:15})
+                //以上兩者相同
+
+                [setDefind](state,payload){//setDefind 外部設定字串變數，必須加 []
+                    state.count += payload.amount
+                }
+            }
+        })
+
+        //store.commit("setCount",5)//可以執行 Mutations 裡的方法
+        //store.commit("setPayload",{amount:15})
+
+        //以下這個做法可以把 newProp 設進 Vuex 的 state
+        //Vue.set(obj, 'newProp', 123)
+        //state.obj = { ...state.obj, newProp: 123 }
+
+        store.commit(setDefind,{amount:15})
+
+        const vm = new Vue({
+            el:"#app",
+            data:{
+                count:0,
+            },
+            store,
+            computed:{
+                ...Vuex.mapState({
+                    increment:"count"
+                })
+            },
+            methods:{
+                ...Vuex.mapMutations({
+                    incrementBy:"increment"//incrementBy 變成是一個方法了，可以用於 @click 來操作
+                })
+            }
+        })
+    </script>
+</body>
+</html>

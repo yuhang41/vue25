@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs10</title>
+</head>
+<body>
+    <div id="app">
+       <!-- <basic-component basic-name = "Hello World"></basic-component> -->
+       <avd-component style="background: blue;"></avd-component>
+
+       <!-- 如果 checked 沒有傳 props 值，HTML tag 會自動指定 checked 為原始的HTML tag 所擁有的值，這裡的 checked 會變成 checked="checked" ，而 "checked" 就是打勾的意思 -->
+       <input-component checked="checked" class="AAA"></input-component>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let InputComponent ={
+            inheritAttrs: false,
+            template:`<label><input type="checkbox" class="BBB" v-bind="$attrs"/></label>`
+                        //沒有 props ，外層 checked 得關係，在這自動加上 checked="checked"
+                        //class 會跟外部的 calss 合併 ，但是內部的class 會在這前，合併後 class="BBB AAA"
+                        //如果這段是在 label 內部，而 checked class="AAA" 會被注入在 label 上 
+                        //可以使用 inheritAttrs: false 把 checked 綁在 input 上，但 input 要給 v-bind="$attrs" ，才能綁上
+                        //$attrs 在沒有 props 情況，可以綁定  父tag  要傳的屬性
+        }
+        let BasicComponent = {
+            //props:["basicName"],
+            data(){
+                return{
+                    innum:this.numb
+                }
+                
+            },
+            props:{
+                basicName:Number,
+                "is-active":Boolean,
+                "is-active2":Boolean,
+                insideObject:Object,
+                numb:Number,
+                obj:{
+                    type:Object,
+                    default:undefined
+                    //Object如果要做 default: 就必須要 用function(){}
+                },
+                ary:{
+                    type:Array,
+                    default:undefined
+                    //Array如果要做 default: 就必須要 用function(){}
+                },
+                num:{
+                    type:Number,
+                    default:undefined
+                },
+                str:{
+                    type:String,
+                    //default 跟 validator 不能去操作到 data 跟 computed
+                    default:undefined,
+                    validator: function (value) {
+                        return ['success', 'warning', 'danger'].indexOf(value) !== -1
+                    }    
+                }
+            },
+            template:`<div>{{innum}}<button @click="innum++">+</button></div>`,
+            
+        }
+        let AvdComponent = {
+            data(){
+                return {
+                    number:50,
+                    active:true,
+                    obj:{
+                        count:0
+                    },
+                    num:0,
+                }
+            },
+            components:{
+                BasicComponent,
+            },
+            template:`                
+                    <basic-component :basic-name = number 
+                                     :is-active="active" is-active2
+                                     :inside-object = "obj"
+                                     :numb="num"
+                                     str="danger"
+                                     style="background: red;"></basic-component>                
+                    `               //外部的 HTML style 會繼承到這，但外部 style 屬於後者，會覆蓋內部的 style
+        }
+
+        //Vue.component("basic-component",BasicComponent)
+        // Vue.component("avd-component",AvdComponent)
+
+        new Vue({
+            el:"#app",
+            
+            components:{      
+                AvdComponent,
+                InputComponent 
+            }
+        })
+    </script>
+</body>
+</html>

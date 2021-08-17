@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs13</title>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <style>
+        .fade-enter,
+        .fade-leave-to{
+            opacity: 0;
+        }
+        .fade-enter-active,
+        .fade-leave-active{
+            transition: opacity .5s;
+        }
+        .fade-enter-to,
+        .fade-leave{
+            opacity: 1;
+        }
+        .fade-move{
+            transition: transform 1s;
+        }
+
+
+        .bounce-enter-active {
+            animation: bounce-in .5s;
+        }
+        .bounce-leave-active {
+            animation: bounce-in .5s reverse;
+        }
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0,0);
+            }
+            50% {
+                transform: scale(1.5,20);
+            }
+            100% {
+                transform: scale(1,1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">        
+        <!-- transition 內部只能有一個 dom -->
+    <!-- <button @click="show =!show">Try1</button> -->
+        <!-- 使用 Css 裡的 animation 來處理
+        <transition name="bounce">
+            <p v-if="show">Hellow World</p>
+        </transition> -->
+        
+        <!-- 使用 Class 的方式指定做出的效果，每個屬性開頭都要加上 animate__，
+             https://animate.style/  效果可以從此網站找到 
+        <transition 
+         enter-active-class="animate__animated animate__tada"
+         leave-active-class="animate__animated animate__bounceOutRight">
+            <p v-if="show">Hellow World</p>
+        </transition> -->
+
+        <!-- 使用JaveScript Hook 來執行
+         :css="false"意思是這段不用css來執行
+         mode="out-in" 先把原有的畫面先結束掉，再把另外一個放上來畫面裡
+         mode="in-out" 處理變換畫面，同時顯示兩者，再把要消失的給隱藏起來
+        <transition 
+         @before-enter="beforEnter"
+         @after-enter="afterEnter"
+         @enter="enterHandler"
+         @leave="leaveHandler" 
+         :css="false"
+         mode="out-in"
+        >   
+            <component :is="view"></component>
+            -- <p v-if="show">Hellow World</p> --
+            -- <p :key="show">Hellow World:{{ show }}</p> --
+        </transition> -->
+
+        <!-- transition-group 裡的內容強制要key，可以設定 tag 來表示是甚麼是甚麼標籤(預設是span) 
+        <transition-group
+         tag="div"
+         @before-enter="beforEnter"
+         @after-enter="afterEnter"
+         @enter="enterHandler"
+         @leave="leaveHandler" 
+         :css="false"
+         mode="out-in"
+         appear ->剛進入畫面時也要有動畫效果
+        >
+            <component :is="view" :key="view"></component>
+        </transition> -->
+        
+        <button @click="clickHandler">Try2</button>
+        <!-- 利用陣列，然後用.fade-move做出效果，如果是display:inline，就不會有效果 -->
+        <transition-group
+         tag="div"
+         name="fade"
+        >
+        <li v-for="item in items" :key="item">
+            {{ item }}
+          </li>
+        </transition>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+    <script>
+        new Vue({
+            el:"#app",
+            data:{
+                show:true,
+                view:"v-a",
+                items: [1,2,3,4,5,6,7,8,9]
+            },
+            methods:{
+                clickHandler(){
+                    //_.shuffle()打亂排序，但是必須設回 this.items，因為_.shuffle()不會更改到原有的陣列
+                    this.items = _.shuffle(this.items)
+                },
+                beforEnter(el){
+                    // 要先做，不然當 fadeIn 時若是 1，動畫會看起來沒出現，
+                    //意思是說重新執行後，會讓 opacity 變回 0 
+                    $(el).css({opacity:"0"});
+                },
+                afterEnter(el){
+                    $(el).css({opacity:""});
+                },
+                enterHandler(el,done){
+                    //fadeTo(時間，opacity效果 0~1之間，時間結束後要執行的函式)
+                    //done 是要結束的意思
+                    $(el).fadeTo(400,1,done)
+                },
+                leaveHandler(el,done){
+                    //fadeOut(時間，時間結束後要執行的函式)
+                    $(el).fadeOut(400,done)
+                }
+            },
+            components: {
+                'v-a': {
+                    template: '<div>Component A</div>'
+                },
+                'v-b': {
+                    template: '<div>Component B</div>'
+                }
+            }
+        })
+    </script>
+</body>
+</html>

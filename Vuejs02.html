@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs02</title>
+</head>
+<body>
+    <div id="app">        
+        <p>{{html}}</p>
+        <p v-html="html">123</p>
+        <p v-text="html">123</p>
+    </div>
+     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script type="text/javascript">
+      let data = {
+          msg:"hele msg",
+          html:"<span style='color:red;'> This should be red</span>"
+      };
+      let vm =new Vue({
+          el:"#app",
+          data
+      });
+  </script>
+</body>
+</html>

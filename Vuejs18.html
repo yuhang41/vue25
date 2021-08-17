@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs18</title>
+</head>
+<!-- 
+    網址命名
+    顯示多個 router-View 在同一層，網址也會更動
+    Redirect 從 path 更換到 redirect 給的網址
+    Alias 可以用兩個網址都可以顯示同個 component
+ -->
+<body>
+    <div id="app">
+        
+        <!-- <router-link to="/user/123">User</router-link> -->
+        
+
+        <button @click="$router.push({name:'user',params:{id:123}})">Push RouterLink</button>
+        
+        <router-view name="header"></router-view>
+        <router-view name="nav"></router-view>
+         <router-view></router-view> <!-- default -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        let Header ={
+            template:`
+            <p>
+                <router-link to="/">Index</router-link>
+                <router-link :to="{name:'user',params:{id:123}}">User</router-link>
+                <router-link to="/userAlias/555">UserAlias</router-link>
+                <router-link to="/pageAlias">UserAlias</router-link>
+                <router-link to="/page1">Page1</router-link>
+                <router-link to="/page2">Page2</router-link>
+            </p>
+            `
+        }
+
+        let Index ={
+            template:`<div class="page">Index</div>`
+        }
+        let User ={
+            template:`
+                <div class="page">
+                    User{{$route.params.id}}
+                </div>
+            `,
+            mounted(){
+                console.log("User")
+            }    
+        } 
+        let Page1 = {
+            template:`<div>Page 1</div>`
+        }
+        let Page2 = {
+            template:`<div>Page 2</div>`
+        }             
+        
+        let router = new VueRouter({
+            routes:[
+                {
+                    path:"/",
+                    //component: Index
+                    components:{
+                        default: Index,
+                        header: Header,
+                        nav: Page1
+                    }
+                },
+                {
+                    path:"/user/:id",
+                    name:"user",
+                    //component: User,
+                    components:{
+                        default: User,
+                        header: Header,
+                        nav: Page1
+                    },
+                    alias:"/userAlias/:id"                    
+                },
+                {                  
+                    path:'/page1',                
+                    //component: Page1,
+                    components:{
+                        default: Page1,
+                        header: Header,
+                        nav: Page1
+                    },
+                    alias:"/pageAlias"
+                },
+                {
+                    path:"/page2",
+                    //component: Page2
+                    components:{
+                        default:Page2,
+                        header:Header,
+                        nav:Page1
+                    }
+                },
+            ]
+        })
+        new Vue({
+            el:"#app",
+            router,
+            data:{
+            }
+        })
+    </script>    
+</body>
+</html>

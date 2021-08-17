@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs05</title>
+</head>
+<body>
+    <div id="app">
+        <template v-if="show">
+            <h1>Hello Yuhang</h1>
+            <span>XXX</span>
+        </template>
+
+        <div v-show="show">This v-show</div>
+        <div v-show="!show">This v-show is false</div>
+        <div>{{show ? "This true" : "This false"}}</div>
+
+        <!-- :key 是為了讓系統更快辨別資料，而不用每一筆都去喧染 -->
+        <h1 v-for="value,index in userListArray" :key='value.name'>{{value.name}}</h1>
+        <h1 v-for="value,key in userListObj" :key='value'>{{key}}</h1>
+        <span v-for="num in 10">{{num}}</span>
+        <br/>
+        <span v-for="value,index in 'Yuhang'">{{value+':'+index}}</span>
+        <!--below userListArray use filter -->
+        <h1 v-for="value,index in computedUser">{{value.name}}</h1>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let vm = new Vue({
+            el:"#app",
+            data:{
+                show:true,
+                userListArray:[
+                    {
+                        //key:value
+                        name:"EZ",
+                        gender:"male"
+                    },
+                    {
+                        //key:value
+                        name:"VI",
+                        gender:"female"
+                    }
+                ],
+                userListObj:{
+                    Ez:"male",
+                    Vi:"female"
+                }
+            },
+            computed:{
+                computedUser(){
+                    return this.userListArray.filter((user)=>{
+                        return user.gender==="male"
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs17</title>
+    <style>
+        .router-link-exact-active{
+            background: black;
+            color: white;
+        }
+        .page{
+            box-sizing: border-box;
+            border: 2px solid rgb(222, 000, 000);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            width: 100%;
+        }
+    </style>
+</head>
+<!-- 巢狀路由(router) -->
+<body>
+    <div id="app">
+        <router-link to="/">Index</router-link>
+        <router-link to="/user">User</router-link>
+        <router-link to="/posts">Posts</router-link>
+        <router-link to="/user/profile">User Profile</router-link>
+        <router-link to="/user/posts">User Posts</router-link>
+        <router-view></router-view>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        let Index ={
+            template:`<div class="page">Index</div>`
+        }
+        let User ={
+            template:`
+                <div class="page">
+                    User
+                    <router-view></router-view>
+                </div>
+            `,//內部在搭配<router-view></router-view> 子路由顯示
+            mounted(){
+                console.log("User")
+            }    
+        }
+        let Profile ={
+            template:`
+                <div class="page">Profile</div>
+            `,
+            mounted(){
+                console.log("Profile")
+            }
+        }
+        let Posts ={
+            template:`
+                <div class="page">Posts</div>
+            `,
+            mounted(){
+                console.log("Posts")
+            }
+        }
+        
+
+        let router = new VueRouter({
+            routes:[
+                {
+                    path:"/",
+                    component: Index
+                },
+                {
+                    path:"/user",//父
+                    component: User,
+                    children:[//子路由
+                        {
+                            path:"profile", //子，不能打成 /profile ，這樣會認為是外層
+                            component: Profile
+                        },
+                        {
+                            path:"posts", //子
+                            component: Posts
+                        },
+                        {
+                            path:"/posts", //被認為外層
+                            component: Posts
+                        }
+                    ]
+                }
+            ]
+        })
+        new Vue({
+            el:"#app",
+            router,
+            data:{
+
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VuejsX22</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{count}}</p><!-- 這是從 vue data 出來的資料 -->
+        <!-- <p>{{ store.state.count}}</p> 
+            這是用 vuex 抓出來的資料，但是這是行不通的，必須要由 vue 去抓才可以成功 -->
+        <p>{{$store.state.count}}</p><!-- $store 意思會從 vue 裡去找store -->
+        <p>{{storeCount}}</p>
+        <p>Vuex Getter: {{even}}</p>
+        <p>Vuex Getter: {{evennumbers}}</p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.5.1/vuex.js"></script>
+    <script>
+        let data={
+            count:0,
+        }
+        const store = new Vuex.Store({
+            //state 可以想像成是 vue 的 data
+            state:{
+                count:0,
+                numbers:[0,1,2,3,4,5,6,7],
+                todos: [
+                    { id: 1, text: '...', done: true },
+                    { id: 2, text: '...', done: false },
+                    { id: 2, text: '哈喽', done: false}
+                ]
+            },
+            getters:{//getters 可以想像成是 vue 的 computed
+                oddNumbers(state){
+                    return state.numbers.filter(num =>{
+                        return num % 2
+                    })
+                },
+                evenNumbers(state){
+                    return state.numbers.filter(num =>{
+                        return (num % 2) - 1
+                    })
+                },
+                getTodoById(state){
+                    return (id) =>{
+                        state.todos.find(todo =>{
+                           return state.todo.id === id
+                        })
+                    }
+                },
+                getTodo(state){
+                    return state.todos.map(item => item.text)
+                }
+
+            }
+        })
+        const vm = new Vue({
+            el:"#app",
+            data,
+            store,
+        //第一種作法 使用 computed 然後用 this.$store 來呼叫 Vuex
+            // computed:{
+            //     storeCount(){
+            //         return this.$store.state.count//必須要有 $ 符號才能抓得到 Vuex 的 state
+            //     }
+            // }
+        //第二種做法 使用 Vuex.mapState 可以更簡易的方法來做跟上面相同的結果
+            computed:{
+            //取 Vuex 的 satter 裡的值
+                ...Vuex.mapState({
+                    //有三種方式呼叫
+                    //第一種
+                    //storeCount:(state) => state.count 簡易的呼叫法 省略了 $ 
+                    //第二種 
+                    //storeCount:'count'//跟第一種一樣，差別不大
+                    //第三種
+                    storeCount(state){ //這種作法比較適合用在複雜度的時候用
+                        return state.count
+                    },
+                    todos:"todos",
+                }),
+                evennumbers(){
+                    return this.$store.getters.evenNumbers
+                },
+            //取 Vuex 的 getter 裡的 function
+                ...Vuex.mapGetters({
+                    TodoByID: 'getTodoById',
+                    even:'evenNumbers'
+                })
+            },
+            methods:{
+                getTodoById(id){
+                    return this.todos.find(todo =>{
+                        return todo.id === id
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Route</title>
+</head>
+<!-- Dynamic Route -->
+<body>
+    <div id="app">
+        <router-view></router-view>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.4.3/vue-router.js"></script>
+    <script>
+        let User ={
+            template:`<div>User {{ $route.params.id }}</div>`
+            //這裡的 id 是網址 path:"/user/:id" 的 :id
+        }       
+        let Try ={
+            template:`<div>Try {{ $route.params.username + $route.params.post_id}}</div>`
+        }
+
+        let Error = {
+            template:`<div>404</div>`
+        }
+        
+        let router =new VueRouter({
+            //routes分配規則
+            routes:[
+                {
+                    path:"/user/:id",
+                    //:id 是給使用者自己打的參數，在網址上這樣打 ex: /user/123 或是 /user/aaa 就會加入 $route.params 裡
+                    component: User
+                },
+                {
+                    path:"/try/:username/:post_id",
+                    component: Try
+                },
+                //以下是判斷網址亂打情況
+                {
+                    path:"/404",
+                    component: Error
+                },
+                {
+                    path:"*",
+                    redirect:"/404"//假如網址亂打，會自動讓亂打網址變成 /404
+                },
+                {
+                    path:"*",
+                    component: Error
+                }
+            ],
+        })
+        new Vue({
+            el:"#app",
+            router,
+            data:{
+                show:1
+            }
+        })
+    </script>
+</body>
+</html>

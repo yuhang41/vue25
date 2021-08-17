@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs07</title>
+</head>
+<body>
+    <div id="app">
+        <p>{{ word }}</p>
+        <p><input v-model="word" type="text"/></p>
+        <p><textarea v-model="word" type="text"></textarea></p>
+        <hr />
+        
+        <!-- checkbox 的判定就是 true 跟 false
+             true-value 當選單 true 時 edm 的值 會顯示 true-value 的值
+             false-value 當選單 false 時 edm 的值 會顯示 false-value 的值-->
+        <p><input v-model="edm" type="checkbox" true-value="Yes" false-value="No"/>帥氣指數</p>
+
+        <!-- 使用 checkbox 會使選單同時被一起選，
+             只要把 v-model 所綁定的資料改 [陣列] 就可以了，還可以知道選擇的先後順序 -->
+        <div>
+            <p><input v-model="checkArray" type="checkbox" value="A"/>A</p>
+            <p><input v-model="checkArray" type="checkbox" value="B"/>B</p>
+            <p><input v-model="checkArray" type="checkbox" value="C"/>C</p>
+        </div>
+
+        <!-- 使用 radio 會使選項不會被複選，只能單選 -->
+        <div>
+            <p><input v-model="check" type="radio" value="A"/>A</p>
+            <p><input v-model="check" type="radio" value="B"/>B</p>
+            <p><input v-model="check" type="radio" value="C"/>C</p>
+        </div>
+
+        <!-- select 
+             disabled 功能意思是只要你選過之後，就不能後悔把這個選項空白，也可以說這個選項是必填 -->
+        <div>
+            <p>
+                <select v-model="selected">
+                    <option disabled value="">Please select one</option>
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
+                </select>
+                <span>Selected: {{ selected }}</span>
+            </p>
+        </div>
+
+        <!-- .number
+             這裡 gender 的值是 int 數字值，但是點下男或女後，會去取 value 值，而 value 是字串，gender 就會轉型變成字串的值
+             所以 v-model 只要加上 .number ，gender 就不會轉型成字串 -->
+        <p><input v-model.number="gender" type="radio" value="1"/>男</p>
+        <p><input v-model.number="gender" type="radio" value="0"/>女</p>
+
+        <!-- .trim 去頭尾的空白 -->
+        <p><input v-model.trim="word" type="text"/></p>
+        
+        <!-- .lazy 去處理 change 事件，不斷觸發 change 時，change 所改變的結果不會有動作，直到離開事件偵聽，才會去執行結果-->
+        <p>{{ word }}</p>
+        <p><input v-model.lazy="word" type="text"/></p>
+        <p><textarea v-model="word" type="text"></textarea></p>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el:"#app",
+            data:{
+                word:"Hello Yuhang",
+                edm:true,
+                check:"A",  
+                checkArray:[],
+                selected:[],
+                gender:1,
+                
+            },
+            computed:{
+                
+            }
+        })
+    </script>
+</body>
+</html>

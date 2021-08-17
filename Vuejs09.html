@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs09</title>
+</head>
+<body>
+    <div id="app">
+        <!-- <out-to-input-component @custom-input="inputHandler" v-model="inputText"></out-to-input-component> -->
+        <input-to-out-component @custom-input="inputHandler"></input-to-out-component>
+        <filter-component @filter="filterHandler"></filter-component>
+        <ul>
+            <li is="list-item-component" v-for="(item,index) of filterList" 
+            :key="item.timestamp" :item="item" @delete="deleteHandler"></li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        Vue.component("filter-component",{
+            data(){
+                return{
+                    buttonList:[
+                        {text:"全部",value:"all"},
+                        {text:"未完成",value:"don"},
+                        {text:"完成",value:"end"},
+                    ]
+                }
+            },
+            template:`
+            <p>
+                <button v-for="item of buttonList" :key="item.text" @click="$emit('filter',item.value)">
+                {{item.text}}
+                </button>
+                
+            </p>
+            `
+        })
+        //區分外到內，跟內到外的v-model作法
+        //1.外到內
+        // Vue.component("out-to-input-component",{
+        //     props:['value'],//value 是 v-model="inputText" 裡 inputText的值
+        //     template:`
+        //         <p><input type="text" 
+        //         v-bind:value="value"
+        //         v-on:input="$emit('input', $event.target.value)"
+        //         @keyup.enter="inputHandler"></p>
+        //     `,
+        //     methods:{
+        //         inputHandler(){
+        //             this.$emit("custom-input")
+        //         },
+        //     }
+        // })
+        //2.內到外
+        Vue.component("input-to-out-component",{
+            data(){
+                return{
+                    inputText:"",
+                }
+            },
+            template:`
+                <p><input type="text" 
+                v-model="inputText"
+                @keyup.enter="inputHandler"></p>
+            `,
+            methods:{
+                inputHandler(){
+                    this.$emit("custom-input",this.inputText)
+                    //$emit("傳給 HTML @名稱 "，傳出去的值)，傳資料出去的意思
+                    this.inputText=""
+                },
+            }
+        })
+
+        Vue.component("list-item-component",{
+            data(){
+                return{
+                editing:null,
+                newInpText:"",
+                }
+            },
+            props:["item"],//從 html 傳資料進來 
+            template:`
+            <li>
+                <template v-if="editing === item">
+                    <input type="text" v-model="newInpText">
+                    <button @click="updateFinish">Finish</button>
+                    <button @click="updateCancel">Cancel</button>
+                </template>
+                <template v-else="editing !== item">
+                    <input type="checkbox" v-model="item.statu">
+                    {{item.content}}
+                    <button @click="updateHandler(item)">Update</button>
+                    <button @click="deleteHandler(item)">Delete</button>
+                </template>      
+            </li>
+            `,
+            methods:{
+                deleteHandler(item){
+                    this.$emit("delete",item)
+                },
+                updateHandler(index){
+                    this.editing = index
+                },
+                updateFinish(){                    
+                    this.editing.content = this.newInpText
+                    this.newInpText="",
+                    this.editing=null
+                },
+                updateCancel(){
+                    this.newInpText="",
+                    this.editing=null
+                }
+            }
+        })
+
+        new Vue({
+            el:"#app",
+            data:{
+            //外到內需要此部分    inputText:"",
+                list:[],
+            //    editing:null,
+            //    newInpText:"",
+                show:"all"
+            },
+            computed:{
+                filterList(){
+                    if(this.show === "all"){
+                        return this.list
+                    }
+                    else if(this.show === "don"){
+                        return this.list.filter((item) =>{
+                            return item.statu === false
+                        })
+                    }
+                    else if(this.show === "end"){
+                        return this.list.filter((item) =>{
+                            return item.statu === true
+                        })
+                    }
+                    else{
+                        return []
+                    }
+                }
+                
+            },
+            methods:{
+                filterHandler(value){//這裡的 value 是 $emit('filter',item.value) 裡的 item.value
+                    this.show = value
+                },
+                // 此部分是外到內
+                // inputHandler(){                    
+                //     this.list.push({
+                //         timestamp:new Date().getTime(),
+                //         statu:false,
+                //         content:this.inputText
+                //     })
+                //     this.inputText=""                
+                // },
+                inputHandler(inputText){                    
+                    this.list.push({
+                        timestamp:new Date().getTime(),
+                        statu:false,
+                        content:inputText
+                    })
+                },
+                deleteHandler(item){
+                    this.list = this.list.filter((lis)=>{
+                                    return lis != item 
+                                })
+                }
+                
+            }
+        })
+    </script>
+</body>
+</html>

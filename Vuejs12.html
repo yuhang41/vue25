@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs12</title>
+</head>
+<body>
+    <div id="app">
+        <basic-component title="Hello">
+            <!-- <a href="#">World</a> -->
+
+            <!-- v-slot 指定 slot， v-slot 縮寫 # -->
+            <template v-slot:header>{{test}}</template>
+            <template v-slot:flooter></template>
+            <!-- <template #header>{{test}}</template>
+                 <template #flooter></template> -->
+
+            <!-- 取代預設值
+                 <template v-slot:default>555666</template> -->
+            <!-- 接slot 傳出來的資料 
+                 <template v-slot:default="slotProp">{{slotProp.data.first}}</template> -->
+            <template v-slot:default="{ data }">{{data.first}}</template>
+            
+            <!-- 可以用資料去控制 slotname 要指向誰 -->
+            <template v-slot:[slotname]>7777</template>
+            {{msg}}
+        </basic-component>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>
+        let BasicComponent = {
+            //<slot> 會把外部 HTML 的 <basic-component> World </basic-component>，
+            //這個 World 會預設到 <slot>(預設位子)</slot> ，再把結果顯示到頁面上。
+
+            //HTML component 標籤的 template{{}} 只會去讀 new Vue 的 data。
+
+            //HTML component 有 {{msg}}，BasicComponent 內部 <slot> {{msg}} </slot> 會以 HTML component 外部內容為主。
+
+            //<slot> 可以用 name 命名來區別，被命名的 <slot name="值"> 是不會取預設值來用，
+            //只會取 HTML component 的<template v-slot:name值> {{取這裡的值}} </template>，只要<slot>不指定就用預設值，
+            //v-slot:default 會把其他沒指定 <slot> 的預設值給剔除掉，<slot> 的預設值就只會有指定 v-slot:default 的值，有兩個 v-slot:default 就判定後蓋前。
+
+            //<slot :傳出去的名稱="物件"> 這是用 slot 來傳資料出去，
+            //外部接資料的做法 <template v-slot:default="自訂名稱">{{自訂名稱.內部傳出來的名稱.物件}}。
+            data(){
+                return {
+                msg:"World",
+                insideData:{
+                    first:"Yu",
+                    last:"Hang"
+                }
+                }
+            },
+            template:`
+                <div> 
+                    {{title}} 
+                    <slot name="header">This is Header</slot>
+                    <br/>
+                    <slot :data="insideData"></slot>
+                    <br/>
+                    <slot name="flooter">This is Flooter</slot>
+                </div>
+            `,
+            props:{
+                title:{
+                    type:String,
+                    required:true
+                }
+            }
+        }
+        new Vue({
+            el:"#app",
+            data:{
+                msg:"Hang",
+                test:"ByeBye",
+                slotname:"default"
+            },
+            components:{
+                BasicComponent
+            }
+        })
+    </script>
+</body>
+</html>

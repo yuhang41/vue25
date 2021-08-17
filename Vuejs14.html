@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuejs14</title>
+</head>
+<body>
+    <div id="app">
+        <button @click="ckcikHandler">log</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script>        
+        const mixin1={
+            created(){
+                console.log("m1")
+            },
+            methods:{
+                log(msg){
+                console.log("mixinlog 1:"+msg)
+                }
+            }   
+        }
+        const mixin2={
+            created(){
+                console.log("m2")
+            },
+            methods:{
+                log(msg){
+                console.log("mixinlog 2:"+msg)
+                }
+            }   
+        }
+        const hoolMixin={
+            mounted(){//可以事件偵聽
+                window.addEventListener("resize",this.resizeHandler)
+                this.resizeHandler()
+            },
+            beforDestory(){//事件偵聽完需要刪除的地方
+                window.removeEventListener("resize",this.resizeHandler)
+            },
+            methods:{
+                resizeHandler(){
+                    console.log("!!!")
+                }
+            }
+        }
+        //mixins意思共用功能 computed、methods、watcher、甚至是data(不建議使用)
+        //mixin注意:兩個或以上相同的 method 會被後者的 method 覆蓋，
+        //mixin注意:Hook function() 有 creat() ，這種的就不會有後蓋前的問題
+        //只要是在 new Vue 裡做的都是最後才會做，而在外部的會先做
+        new Vue({
+            el:"#app",
+            mixins:[mixin1,mixin2,hoolMixin],
+            methods:{
+                ckcikHandler(){
+                    this.log('clicked')
+                },
+                log(msg){
+                console.log("My self"+msg)
+                }
+            },
+            created(){
+                console.log("My self")
+            },
+        })
+    </script>
+</body>
+</html>
